@@ -30,7 +30,7 @@
 5. 一些基本Node程序的样例
 6. 让我们先关注JavaScript...
 
-**1.1 基于 JavaScript 构建**
+#### **1.1 基于 JavaScript 构建**
 
 无论好坏，JavaScript 都是世界上最流行的编程语言。如果你做过任何网络编程，这是不可避免的。 JavaScript，因为网络的纯粹覆盖范围，实现了 Java 的“一次编写，随处运行”的梦想
 早在20世纪90年代。
@@ -46,7 +46,7 @@ Node 使用 V8，即为 Google Chrome 提供支持的虚拟机，用于服务器
 
 谁知道 JavaScript 最终会成为一种引人注目的用于编写服务器端应用程序的语言？ 然而，由于其广泛的覆盖范围、性能和其他特征前面提到，Node 已经获得了很大的关注。 JavaScript 只是这个难题的一小部分； Node 使用 JavaScript 的方式更加引人注目。 为了了解 Node 环境，让我们深入了解您最熟悉的 JavaScript 环境：浏览器。
 
-**1.2 异步和事件驱动：浏览器**
+#### **1.2 异步和事件驱动：浏览器**
   node提供一个事件驱动和异步平台给服务端js。它将js引入服务器的方式与浏览器引入客户端的方式非常相似。为了理解 Node 的工作原理，了解浏览器的工作原理非常重要。 两者都是事件驱动的（它们使用事件循环）并且在处理 I/O 时是非阻塞的（它们使用异步 I/O）。 让我们看一个例子来解释这意味着什么
 事件循环和异步I/O 想了解更多关于事件循环和异步I/O，可以看Wikipedia相关的文章： http://en.wikipedia.org/wiki/Event_loop 、 http://en.wikipedia.org/wiki/Asynchronous_I/O
 采用 jQuery 使用 XMLHttp-Request (XHR) 执行 Ajax 请求的常见片段
@@ -71,7 +71,7 @@ console.log(data);
   值得庆幸的是，事实并非如此。 当 I/O 发生在浏览器中时，它发生在事件循环之外（主脚本执行之外），然后当 I/O 完成时发出一个“事件”，由函数处理通常称为“回调”）如图1.1所示
   I/O 异步发生，不会“阻止”脚本执行，从而允许事件循环响应页面上正在执行的任何其他交互或请求。 这使得浏览器能够响应客户端并处理页面上的大量交互。
   记下这一点，然后切换到服务器
-**1.3 异步和事件驱动：服务器**
+#### **1.3 异步和事件驱动：服务器**
   在大多数情况下，您可能熟悉服务器端编程的传统 I/O 模型，例如 1.2 节中的“阻塞”jQuery 示例。 这是 PHP 中的示例
   ```js
 $result=mysql_query('SELECT*FROMmyTable'); // 执行会暂停直到DB请求完成
@@ -89,7 +89,7 @@ print_r($result);
   ![2](./img/aoache:nginx%20benchmark.png)
 
 
-**1.4 脏应用程序**
+#### **1.4 脏应用程序**
 
 实际上，Node 设计的应用程序类型有一个缩写词：DIRT。它代表数据密集型实时应用程序。由于 Node 本身在 I/O 方面非常轻量级，因此它擅长将数据从一个管道转移或代理到另一个管道。它允许服务器保持多个连接打开，同时处理许多请求并保持较小的内存占用。它被设计为响应式的，就像浏览器一样。实时应用程序是网络的一个新用例。 现在，许多网络应用程序几乎可以即时提供信息，实现在线白板协作、实时定位接近的公共交通巴士以及多人游戏等功能。无论是通过实时组件增强现有应用程序还是全新类型的应用程序，网络都正在朝着更具响应性和协作性的环境发展。然而，这些新型 Web 应用程序需要一个能够几乎立即响应大量并发用户的平台。Node 擅长于此，不仅适用于 Web 应用程序，还适用于其他 I/O 密集型应用程序
   使用 Node 编写的 DIRTy 应用程序的一个很好的例子是 Browserling（brow-serling.com，如图 1.3 所示）。该网站允许在浏览器内使用其他浏览器。这对于前端开发者来说非常有用，因为它使他们不必安装大量浏览器和操作系统来测试。Browserling 利用名为 StackVM 的node驱动项目，该项目管理使用 QEMU（快速仿真器）模拟器创建的虚拟机 (VM)。QEMU 模拟运行浏览器所需的 CPU 和外设。
@@ -99,3 +99,75 @@ print_r($result);
   （1） 在浏览器中，用户的鼠标和键盘事件通过 WebSocket 实时传递到 Node.js，Node.js 又将它们传递到模拟器
   （2）受用户交互影响的模拟浏览器的重绘区域通过 Node 和 WebSocket 流回，并绘制在浏览器的画布上。
   Browserling和Testling是 DIRTy 应用程序的好例子，当您坐下来编写第一个 Node 应用程序时，用于构建此类可扩展网络应用程序的基础设施正在发挥作用。 让我们看看 Node 的 API 如何提供这个开箱即用的工具。
+
+ #### 1.5 DIRTy by default
+
+   Node 是从头开始构建的，具有事件驱动和异步模型。JavaScript 从来没有标准 I/O 库，而这对于服务器端语言来说是常见的。JavaScript 的“宿主”环境始终决定这一点。JavaScript 最常见的宿主环境（大多数开发人员都习惯使用的环境）是浏览器，它是事件驱动和异步的。
+   Node 尝试通过重新实现通用主机对象来保持浏览器和服务器之间的一致性，例如这些：
+   Timer API (for example, setTimeout)
+   Console API (for example, console.log)
+  Node 还包括一组用于多种类型网络和文件 I/O 的核心模块。其中包括 HTTP、TLS、HTTPS、文件系统 (POSIX)、数据报 (UDP) 和 NET (TCP) 模块。 核心有意设计得小、低级且不复杂，仅包括基于 I/O 的应用程序的构建块。 第三方模块构建在这些块的基础上，为常见问题提供更好的抽象 
+   
+ ** Platform vs. framework **
+ Node 是 JavaScript 应用程序的平台，不要与框架混淆。 将 Node 视为 Rails 或 JavaScript 的 Django 是一种常见的误解，但实际上它的级别要低得多。 但是，如果您对 Web 应用程序的框架感兴趣，我们将在本书后面讨论一个流行的 Node 框架，称为 Express
+
+ 经过所有这些讨论，您可能想知道 Node 代码是什么样的。 让我们看几个简单的例子：
+
+** 1.5.1 简单的异步示例 **
+
+ 在 1.2 节中，我们查看了使用 jQuery 的 Ajax 示例
+```js
+$.post('/resource.json',function(data){
+    console.log(data);
+    });//script execution continues  
+```
+让我们在 Node 中做类似的事情，但我们将使用文件系统 (fs) 模块从磁盘加载 resource.json。 请注意该程序与前面的 jQuery 示例有多么相似：
+```js
+varfs=require('fs');fs.readFile('./resource.json',function(er,data){console.log(data);}) 
+```
+在此程序中，我们从磁盘读取resource.json 文件。 当读取所有数据时，将调用匿名函数（也称为“回调”），其中包含参数 er、如果发生任何错误以及 data（文件数据）
+该进程在幕后循环，能够处理可能发生的任何其他操作，直到数据准备好为止。 我们之前讨论过的所有事件和异步优势都会自动发挥作用。 这里的区别在于，我们不是使用 jQuery 从浏览器发出 Ajax 请求，而是访问 Node 中的文件系统以获取grabresource.json。 后一个动作如图 1.5 所示
+![5](./img/1.5.png)
+
+　**1.5.2 Hello World HTTP server**
+
+  Node 的一个非常常见的用例是构建服务器。 Node 使得创建不同类型的服务器变得非常简单。 如果您习惯于让服务器托管您的应用程序（例如托管在 Apache HTTP 服务器上的 PHP 应用程序），这可能会感觉很奇怪。在 Node 中，服务器和应用程序是相同的。
+
+  ```js
+varhttp=require('http');http.createServer(function(req,res){res.writeHead(200,{'Content-Type':'text/plain'});res.end('HelloWorld\n');}).listen(3000);console.log('Serverrunningathttp://localhost:3000/');
+
+varhttp=require('http');varserver=http.createServer();
+server.on('request',function(req,res){res.writeHead(200,{'Content-Type':'text/plain'});res.end('HelloWorld\n');})
+server.listen(3000);
+console.log('Serverrunningathttp://localhost:3000/');
+```
+每当请求发生时，就会触发 回调函数function(req,res) ，并写出“HelloWorld”作为响应。 此事件模型类似于侦听浏览器中的 onclick 事件。 单击可能在任何时候发生，因此您设置一个函数来执行一些逻辑来处理该问题。 在这里，Node 提供了一个函数，每当请求发生时都会做出响应。
+
+
+　** 1.5.3 Streaming data **
+
+Node在streams和streaming方面也很强大。 您可以将streams视为类似于数组，但数据不是分布在空间上，而是可以将streams视为分布在时间上的数据。 通过逐块引入数据，开发人员能够在数据进来时对其进行处理，而不是等待所有数据到达后再采取行动。 这是流式传输 resources.json 的方式
+
+``` js
+
+varstream=fs.createReadStream('./resource.json')
+stream.on('data',function(chunk){console.log(chunk)})
+stream.on('end',function(){console.log('finished')})
+```
+
+每当新的数据块准备就绪时，就会触发数据事件，而当所有数据块都已加载时，就会触发结束事件。块的大小可能会有所不同，具体取决于数据类型。 这种对读取流的低级访问使您可以在读取数据时有效地处理数据，而不是等待所有数据都缓冲在内存中。
+可读和可写的流可以连接起来形成管道，就像使用 | （pipe）一样。 shell 脚本中的（管道）运算符。 这提供了一种在数据准备好后立即写出数据的有效方法，而无需等待完整的资源被读取然后写出
+让我们使用之前的 HTTP 服务器来说明将图像流式传输到客户端
+```js
+varhttp=require('http');
+varfs=require('fs');
+http.createServer(function(req,res){res.writeHead(200,{'Content-Type':'image/png'});fs.createReadStream('./image.png').pipe(res);}).listen(3000);
+// Piping from a readable stream to a writable stream
+console.log('Serverrunningathttp://localhost:3000/');
+```
+在此单行代码中，数据从文件 (fs.createReadStream) 中读入，并在传入时将其发送 (.pipe) 到客户端 (res)。事件循环能够在数据被读取时处理其他事件。
+Node 跨多个平台（包括各种 UNIX 和 Windows）提供了这种默认的 DIRTy 方法。 底层异步 I/O 库 (libuv) 专为提供统一体验而构建，无论父操作系统如何，这使得程序可以更轻松地跨设备移植，并在需要时在多个设备上运行
+
+#### 总结
+
+与任何技术一样，Node 并不是灵丹妙药。 它只是帮助您解决某些问题并开启新的可能性。 Node 的有趣之处之一是它将系统各个方面的人们聚集在一起。 许多人作为 JavaScript 客户端程序员来到 Node； 其他人是服务器端程序员； 其他人是系统级程序员。 无论您适合哪里，我们希望您了解 Node 适合您的堆栈中的位置

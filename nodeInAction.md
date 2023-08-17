@@ -168,7 +168,7 @@ console.log('Serverrunningathttp://localhost:3000/');
 在此单行代码中，数据从文件 (fs.createReadStream) 中读入，并在传入时将其发送 (.pipe) 到客户端 (res)。事件循环能够在数据被读取时处理其他事件。
 Node 跨多个平台（包括各种 UNIX 和 Windows）提供了这种默认的 DIRTy 方法。 底层异步 I/O 库 (libuv) 专为提供统一体验而构建，无论父操作系统如何，这使得程序可以更轻松地跨设备移植，并在需要时在多个设备上运行
 
-#### 总结
+#### 1.6 总结
 
 与任何技术一样，Node 并不是灵丹妙药。 它只是帮助您解决某些问题并开启新的可能性。 Node 的有趣之处之一是它将系统各个方面的人们聚集在一起。 许多人作为 JavaScript 客户端程序员来到 Node； 其他人是服务器端程序员； 其他人是系统级程序员。 无论您适合哪里，我们希望您了解 Node 适合您的堆栈中的位置
 
@@ -178,3 +178,5 @@ Node 跨多个平台（包括各种 UNIX 和 Windows）提供了这种默认的 
 设计给数据密集型实时应用
 
 在第 2 章中，我们将构建一个简单的 DIRTy Web 应用程序，以便您可以了解Node用程序的工作原理
+
+# 第二章 Building a multiroom chat application 

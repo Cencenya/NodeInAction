@@ -250,7 +250,7 @@ Node 跨多个平台（包括各种 UNIX 和 Windows）提供了这种默认的 
 
   现在您已经大致了解了应用程序将使用的核心技术，让我们开始充实它
 
-#### Creating the application file structure
+#### 2. 1 Creating the application file structure
 
   要开始构建教程应用程序，请为其创建一个项目目录。 主应用程序文件将直接位于该目录中。 您需要添加一个 lib 子目录，其中将放置一些服务器端逻辑。 您需要创建一个公共子目录来放置客户端文件。 在 public 子目录中，创建一个 javascripts 子目录和一个 stylesheets 目录。
 
@@ -260,7 +260,7 @@ Node 跨多个平台（包括各种 UNIX 和 Windows）提供了这种默认的 
 
   在这种情况下，应用程序依赖项是需要安装以提供应用程序所需功能的模块。 举例来说，您正在创建一个应用程序，需要访问使用 MySQL 数据库存储的数据。Node 没有提供允许访问 MySQL 的内置模块，因此您必须安装第三方 模块，这将被视为依赖项。
 
-#### Specifying dependencies
+#### 2.2 Specifying dependencies
 
   尽管您可以在不正式指定依赖项的情况下创建 Node 应用程序，但花时间指定它们是一个好习惯。 这样，如果您希望其他人使用您的应用程序，或者您计划在多个地方运行它，那么设置就变得更加简单。
 
@@ -270,7 +270,7 @@ Node 跨多个平台（包括各种 UNIX 和 Windows）提供了这种默认的 
 
   如果这个文件的内容看起来有点令人困惑，别担心...您将在下一章中了解有关 package.json 文件的更多信息，并在第 14 章中深入了解。
 
-#### Installing dependencies
+#### 2.3 Installing dependencies
 
   定义了 package.json 文件后，安装应用程序的依赖项就变得很简单。 Node 包管理器（npm；https://github.com/isaacs/npm）是一个与 Node 捆绑在一起的实用程序。 它提供了大量的功能，允许您轻松安装第三方 Node 模块并全局发布您自己创建的任何 Node 模块。 它可以做的另一件事是从 package.json 文件中读取依赖项并使用单个命令安装每个依赖项
 
@@ -283,3 +283,32 @@ npm install
   如果你现在查看教程目录，应该有一个新创建的node_modules目录，如图2.7所示。 该目录包含您的应用程序的依赖项
 
   建立目录结构并安装依赖项后，您就可以开始充实应用程序逻辑了
+
+#### 2.4 Serving the application’s HTML, CSS, and client-side JavaScript
+
+  如前所述，聊天应用程序需要能够执行三项基本操作：
+
+（1）向用户的网络浏览器提供静态文件
+
+（2）在服务器上处理与聊天相关的消息传递
+
+（3）在用户的网络浏览器中处理与聊天相关的消息传递
+
+  应用程序逻辑将由许多文件处理，一些在服务器上运行，一些在客户端上运行，如图2.8所示。 客户端运行的JavaScript文件需要作为静态资产，而不是由Node执行。
+
+  在本节中，我们将解决第一个要求：我们将定义提供静态文件所需的逻辑。 然后我们将添加静态 HTML 和 CSS 文件本身。
+
+##### 2.3.1 Creating a basic static file server
+
+  为了创建静态文件服务器，我们将利用 Node 的一些内置功能以及第三方 mime 插件来确定文件 MIME 类型。
+
+  要启动主应用程序文件，请在项目目录的根目录中创建一个名为 server.js 的文件，并将清单 2.2 中的变量声明放入其中。 这些声明将使您能够访问 Node 的 HTTP 相关功能、与文件系统交互的能力、与文件路径相关的功能以及确定文件的 MIME 类型的能力。 缓存变量将用于缓存文件数据。
+
+```JavaScript
+var http=require('http'); // Built-in http module provides HTTP server and client functionality；
+var fs=require('fs'); // Built-in fs module provides file system related functionalit；
+var path=require('path'); // Built-in path module provides filesystem path–related functionality
+var mime=require('mime');// Add-on mime module provides ability to derive a MIME type based on a filename extension
+var cache={}; // cache object is where the contents of cached files are stored
+
+```

@@ -312,3 +312,51 @@ var mime=require('mime');// Add-on mime module provides ability to derive a MIME
 var cache={}; // cache object is where the contents of cached files are stored
 
 ```
+
+  **发送文件数据和错误响应**
+
+  接下来，您需要添加三个用于提供静态 HTTP 文件的辅助函数。 第一个将在请求不存在的文件时处理 404 错误的发送。将以下辅助函数添加到 server.js
+
+```javascript
+function send404(response){
+response.writeHead(404,{'Content-Type':'text/plain'});
+response.write('Error404:resourcenotfound.');response.end();
+}
+```
+
+  第二个辅助函数提供文件数据。 该函数首先写入适当的 HTTP 标头，然后发送文件的内容。 在server.js中添加以下代码:
+
+```javascript
+function sendFile(response,filePath,fileContents){
+response.writeHead(
+200,
+{"content-type":mime.lookup(path.basename(filePath))});
+response.end(fileContents);
+}
+```
+
+  访问内存存储 (RAM) 比访问文件系统更快。 因此，Node 应用程序通常将常用数据缓存在内存中。 我们的聊天应用程序会将静态文件缓存到内存中，仅在第一次访问时从磁盘读取它们。 下一个帮助器确定文件是否被缓存，如果是，则提供该文件。 如果文件未缓存，则会从磁盘读取并提供服务。 如果该文件不存在，则会返回 HTTP 404 错误作为响应。 将此辅助函数添加到server.js:
+
+```javascript
+function serveStatic(response,cache,absPath){
+if(cache[absPath]){ // Check if file is cached in memory
+sendFile(response,absPath,cache[absPath]); // Serve file from memory
+}else{
+fs.exists(absPath,function(exists){ // Check if file exists
+if(exists){
+fs.readFile(absPath,function(err,data){ // Read file from disk
+if(err){
+send404(response);
+}else{
+cache[absPath]=data;
+sendFile(response,absPath,data); // Serve file read from disk
+}
+}
+);
+}else{
+send404(response); // Send HTTP 404 response
+}
+});
+}
+}
+```

@@ -360,3 +360,20 @@ send404(response); // Send HTTP 404 response
 }
 }
 ```
+
+**创建 HTTP 服务器**
+
+  对于 HTTP 服务器，提供了一个匿名函数作为 createServer 的参数，充当定义应如何处理每个 HTTP 请求的回调。回调函数接受两个参数：请求和响应。 当回调执行时，HTTP 服务器将使用对象填充这些参数，这些对象分别允许您计算出请求的详细信息并发回响应。您将在第 4 章中详细了解 Node 的 http 模块：
+
+```JavaScript
+var server=http.createServer(function(request,response){ // reate HTTP server, using anonymous function to define per-request behavior
+varf ilePath=false;
+if(request.url=='/'){
+filePath='public/index.html'; // Determine HTML file to be served by default
+}else{
+filePath='public'+request.url; // Translate URL path to relative file path
+}
+var absPath='./'+filePath;
+serveStatic(response,cache,absPath); // Serve static file
+});
+```

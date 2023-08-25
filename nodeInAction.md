@@ -366,7 +366,7 @@ send404(response); // Send HTTP 404 response
   对于 HTTP 服务器，提供了一个匿名函数作为 createServer 的参数，充当定义应如何处理每个 HTTP 请求的回调。回调函数接受两个参数：请求和响应。 当回调执行时，HTTP 服务器将使用对象填充这些参数，这些对象分别允许您计算出请求的详细信息并发回响应。您将在第 4 章中详细了解 Node 的 http 模块：
 
 ```JavaScript
-var server=http.createServer(function(request,response){ // reate HTTP server, using anonymous function to define per-request behavior
+var server = http.createServer(function(request,response){ // reate HTTP server, using anonymous function to define per-request behavior
 varf ilePath=false;
 if(request.url=='/'){
 filePath='public/index.html'; // Determine HTML file to be served by default
@@ -377,3 +377,23 @@ var absPath='./'+filePath;
 serveStatic(response,cache,absPath); // Serve static file
 });
 ```
+
+
+
+**启动 HTTP 服务器**
+
+  您已在代码中创建了 HTTP 服务器，但尚未添加启动它所需的逻辑。 添加以下行，启动服务器，请求它侦听 TCP/IP 端口 3000。端口 3000 是任意选择； 任何高于 1024 的未使用端口都可以工作（如果您运行的是 Windows，则 1024 以下的端口也可能工作，或者如果在 Linux 或 OSX 中，您使用特权用户（例如“root”）启动应用程序
+
+```javascript
+server.listen(3000,function(){
+console.log("Serverlisteningonport3000.");
+});
+```
+
+  如果您想查看应用程序此时可以执行哪些操作，可以通过在命令行提示符中输入以下内容来启动服务器
+
+`node server.js`
+
+  服务器运行时，在浏览器中访问 http://127.0.0.1:3000 将触发 404 错误助手，并显示“错误 404：资源未找到”消息。 尽管您已添加静态文件处理逻辑，但尚未添加静态文件本身。 要记住的一点是，可以通过在命令行上使用 Ctrl-C 来停止正在运行的服务器
+
+  接下来，让我们继续添加必要的静态文件，以使聊天应用程序功能更强大

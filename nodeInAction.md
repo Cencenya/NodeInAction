@@ -378,8 +378,6 @@ serveStatic(response,cache,absPath); // Serve static file
 });
 ```
 
-
-
 **启动 HTTP 服务器**
 
   您已在代码中创建了 HTTP 服务器，但尚未添加启动它所需的逻辑。 添加以下行，启动服务器，请求它侦听 TCP/IP 端口 3000。端口 3000 是任意选择； 任何高于 1024 的未使用端口都可以工作（如果您运行的是 Windows，则 1024 以下的端口也可能工作，或者如果在 Linux 或 OSX 中，您使用特权用户（例如“root”）启动应用程序
@@ -397,3 +395,100 @@ console.log("Serverlisteningonport3000.");
   服务器运行时，在浏览器中访问 http://127.0.0.1:3000 将触发 404 错误助手，并显示“错误 404：资源未找到”消息。 尽管您已添加静态文件处理逻辑，但尚未添加静态文件本身。 要记住的一点是，可以通过在命令行上使用 Ctrl-C 来停止正在运行的服务器
 
   接下来，让我们继续添加必要的静态文件，以使聊天应用程序功能更强大
+
+##### 2.3.2 Adding the HTML and CSS files
+
+  您要添加的第一个静态文件是基本 HTML。 在public目录中创建一个名为index.html的文件，并将清单2.5中的HTML放入其中。 HTML 将包含一个 CSS 文件，设置一些将在其中显示应用程序内容的 HTML div 元素，并加载许多客户端 JavaScript 文件。 JavaScript 文件提供客户端 Socket.IO 功能、jQuery（用于轻松 DOM 操作）以及几个提供聊天功能的特定于应用程序的文件
+
+```html
+<!doctypehtml>
+    <htmllang='en'>
+
+        <head>
+            <title>Chat</title>
+            <linkrel='stylesheet'href=' /stylesheets/style.css'>
+                </link>
+        </head>
+
+        <body>
+            <divid='content'>
+                <divid='room'> // div in which the current room name will be displayed
+                    </div>
+                    <div id='room-list'></div> // div in whicha list ofavailablerooms willbe displayed
+                    <div id='messages'></div> // div in which chat messages will be displayed
+                    <form id='send-form'><inputid='send-message' />
+<input id='send-button'type='submit'value='Send' /> // Form input element in which user will enter commands and messages
+                        <div id='help'>Chatcommands:<ul>
+                                <li>Changenickname:<code>/nick[username]</code></li>
+                                <li>Join/createroom:<code>/join[roomname]</code></li>
+                            </ul>
+                            </div>
+                            </form>
+                            </div>
+                            <scriptsrc=' /socket.io/socket.io.js'type='text/javascript'>
+                                </script>
+                                <scriptsrc='http: //code.jquery.com/jquery-1.8.0.min.js' ➥type='text/javascript'>
+                                    </script>
+                                    <scriptsrc=' /javascripts/chat.js'type='text/javascript'>
+                                        </script>
+                                        <scriptsrc=' /javascripts/chat_ui.js'type='text/javascript'>
+                                            </script>
+        </body>
+
+        </html>
+```
+
+```css
+body {
+  padding: 50px;
+  font: 14px "LucidaGrande", Helvetica, Arial, sans-serif;
+}
+a {
+  color: #00b7ff;
+}
+#content {
+  width: 800px;   // Application will be 800 pixels wide and horizontally centered
+  margin-left: auto;
+  margin-right: auto;
+}
+#room {
+  background-color: #ddd;   // CSS rules for area in which current room name is displayed
+  margin-bottom: 1em;
+}
+#messages { // Message display area will be 690 pixels wide and 300 pixels high
+  width: 690px;
+  height: 300px;
+  overflow: auto;
+  background-color: #eee;   // Allows div in which messages are displayed to scroll when it’s filled up with content
+  margin-bottom: 1em;
+  margin-right: 10px;
+}
+```
+
+  大致完成 HTML 和 CSS 后，运行应用程序并使用 Web 浏览器查看。 该应用程序应如图 2.9 所示。
+
+  该应用程序尚未运行，但正在提供静态文件并建立基本的视觉布局。 处理完这些后，让我们继续定义服务器端聊天消息调度。
+
+
+##### 2.4 Handling chat-related messaging using Socket.IO
+
+  在我们所说的应用程序必须做的三件事中，我们已经介绍了第一件事，即提供静态文件，现在我们将解决第二件事——处理浏览器和服务器之间的通信。 现代浏览器能够使用 WebSocket 处理浏览器和服务器之间的通信。 （有关支持的浏览器的详细信息，请参阅 Socket.IO 浏览器支持页面：http://socket.io/#browser-support。）
+
+  Socket.IO 为 Node 和客户端 JavaScript 提供了一个基于 WebSocket 和其他传输的抽象层。 如果 WebSocket 未在 Web 浏览器中实现，同时保持相同的 API，Socket.IO 将透明地回退到其他 WebSocket 替代方案。 在本节中，我们将
+
+（1）向您简要介绍 Socket.IO 并定义您在服务器端需要的 Socket.IO 功能
+
+（2）添加设置 Socket.IO 服务器的代码
+
+（3）添加代码来处理各种聊天应用程序事件
+
+  Socket.IO 开箱即用，提供虚拟频道，因此您可以仅向订阅特定频道的用户广播，而不是向每个连接的用户广播每条消息。 此功能使得在应用程序中实现聊天室变得非常简单，稍后您将看到。
+
+  Socket.IO 也是event emitters有用性的一个很好的例子。 本质上，event emitters是一种用于组织异步逻辑的便捷设计模式。 您将在本章中看到一些正在工作的event emitters代码，但我们将在下一章中详细介绍
+
+```js
+Event emitters
+Event emitter与某种概念资源相关联，并且可以向该资源发送消息和从该资源接收消息。 
+该资源可以是与远程服务器的连接或更抽象的东西，例如游戏角色。 
+事实上，Johnny-Five 项目 (https://github.com/rwldrn/johnny- Five) 利用 Node 进行机器人应用，使用Event emitter来控制 Arduino 微控制器。
+```

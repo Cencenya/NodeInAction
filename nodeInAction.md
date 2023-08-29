@@ -559,7 +559,8 @@ exports.listen = function(server){
 
   为了处理这些问题，您将添加许多辅助函数。
 
-  **访客名称的指派（assignGuestName）**
+
+**访客名称的指派（assignGuestName）**
 
   您需要添加的第一个辅助函数是 `allocateGuestName`，它处理新用户的命名。 当用户第一次连接到聊天服务器时，该用户被放置在名为 Lobby 的聊天室中，并调用 `allocateGuestName` 为他们分配一个名称，以将他们与其他用户区分开来。
 
@@ -576,4 +577,38 @@ socket.emit('nameResult',{ // Let user know their guest name
 namesUsed.push(name); // Note that guest name is now used
 return guestNumber + 1; //  Increment counter used to generate guest names
 }
+```
+
+
+**加入房间（JOINING ROOMS）**
+
+  您需要添加到 chat_server.js 的第二个辅助函数是 join Room。 该函数如清单 2.9 所示，处理与用户加入聊天室相关的逻辑。 让用户加入 Socket.IO 房间很简单，只需要调用套接字对象的 join 方法。 然后，应用程序将相关详细信息传达给用户和同一房间中的其他用户。 该应用程序让用户知道房间里还有哪些其他用户，并让这些其他用户知道该用户现在在场。
+
+```JavaScript
+ function joinRoom(socket,room) {
+  socket.join(room); // 用户加入房间 
+  currentRoom[socket.id] = room;  // 请注意，用户现在在这个房间中
+  socket.emit('joinResult',{room:room}); // 让用户知道他们现在在新房间
+  socket.broadcast.to(room).emit('message',{ // 让房间中的其他用户知道该用户已加入
+    text:nickNames[socket.id] + 'hasjoined' + room + '.'
+  });
+
+  var usersInRoom = io.sockets.clients(room); // 确定与用户在同一房间的其他用户
+  if ( usersInRoom.length > 1 ) { // 如果存在其他用户，总结他们是谁
+    var usersInRoomSummary = 'Users currently in' + room + ':';
+    for(var index in usersInRoom) {
+      var userSocketId = usersInRoom[index].id;
+       if(userSocketId! = socket.id){
+          if(index>0) {
+             usersInRoomSummary + = ',';
+        }
+
+       usersInRoomSummary += nickNames[userSocketId];
+         }
+       }
+      usersInRoomSummary += '.';
+      socket.emit('message',{text:usersInRoomSummary}); // 将房间内其他用户的摘要发送给该用户
+  }
+}
+
 ```

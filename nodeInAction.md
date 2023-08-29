@@ -520,8 +520,8 @@ var currentRoom={};
 
 ```JavaScript
 
-exports.listen=function(server){
- io=socketio.listen(server); // 启动 Socket.IO 服务器，允许它搭载现有的 HTTP 服务器
+exports.listen = function(server){
+ io = socketio.listen(server); // 启动 Socket.IO 服务器，允许它搭载现有的 HTTP 服务器
  io.set('loglevel',1);
  io.sockets.on('connection',function(socket){ // 定义如何处理每个用户连接
    guestNumber = assignGuestName(socket,guestNumber,nickNames,namesUsed); // 连接时为用户分配访客名称
@@ -540,3 +540,40 @@ exports.listen=function(server){
 ```
 
   建立连接处理后，您现在需要添加单独的辅助函数来处理应用程序的需求。
+
+##### 2.4.2 Handling application scenarios and events
+
+  聊天应用程序需要处理以下类型的场景和事件：
+
+（1）访客名称的指派
+
+（2）更换房间请求
+
+（3）更改名称请求
+
+（4）发送聊天消息
+
+（5）房间的创建
+
+（6）用户断开连接
+
+  为了处理这些问题，您将添加许多辅助函数。
+
+  **访客名称的指派（assignGuestName）**
+
+  您需要添加的第一个辅助函数是 `allocateGuestName`，它处理新用户的命名。 当用户第一次连接到聊天服务器时，该用户被放置在名为 Lobby 的聊天室中，并调用 `allocateGuestName` 为他们分配一个名称，以将他们与其他用户区分开来。
+
+  每个访客名称本质上都是 `Guest`一词，后跟一个数字，每次新用户连接时该数字都会递增。 `Guest`名称存储在 `nickNames` 变量中以供参考，与内部套接字 ID 相关联。 客人姓名也被添加到 `namesUsed` 中，这是一个存储正在使用的姓名的变量。 将以下清单中的代码添加到 lib/chat_server.js 以实现此功能。
+
+```JavaScript
+function assignGuestName(socket,guestNumber,nickNames,namesUsed) {
+var name = 'Guest' + guestNumber; // Generate new guest name
+nickNames[socket.id] = name;  // Associate guest name with client connection ID
+socket.emit('nameResult',{ // Let user know their guest name
+  success:true,
+  name:name
+});
+namesUsed.push(name); // Note that guest name is now used
+return guestNumber + 1; //  Increment counter used to generate guest names
+}
+```

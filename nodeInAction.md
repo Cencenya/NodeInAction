@@ -687,3 +687,20 @@ function handleRoomJoining(socket) {
 ```
 
 ![1693378664612](image/nodeInAction/1693378664612.png)
+
+
+**处理用户断开连接（ HANDLING USER DISCONNECTIONS）**
+
+  最后，您需要将以下逻辑添加到 lib/chat_server.js，以从 nickNames 中删除用户的昵称，并在用户离开聊天应用程序时使用的名称：
+
+```JavaScript
+function handleClientDisconnection(socket) {
+  socket.on("disconnect", function () {
+    varnameIndex = namesUsed.indexOf(nickNames[socket.id]);
+    deletenamesUsed[nameIndex];
+    deletenickNames[socket.id];
+  });
+}
+```
+
+  完全定义服务器端组件后，您现在就可以进一步开发客户端逻辑。

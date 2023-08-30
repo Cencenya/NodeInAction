@@ -651,3 +651,22 @@ function handleNameChangeAttempts(socket, nickNames, namesUsed) {
 }
 
 ```
+
+
+ **发送聊天消息（SENDING CHAT MESSAGES）**
+
+  现在已经处理了用户昵称，您需要添加一个函数来定义显示处理用户发送的聊天消息。 图2.11显示了基本流程：用户发出一个事件，指示要发送消息的房间和消息文本。 然后，服务器将消息转发给同一房间中的所有其他用户。
+
+  将以下代码添加到 lib/chat_server.js。 Socket.IO的广播函数用于中继消息：
+
+```JavaScript
+function handleMessageBroadcasting(socket) {
+  socket.on("message", function (message) {
+    socket.broadcast
+      .to(message.room)
+      .emit("message", { text: nickNames[socket.id] + ":" + message.text });
+  });
+}
+```
+
+![1693378154169](image/nodeInAction/1693378154169.png)

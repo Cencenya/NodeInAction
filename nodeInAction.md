@@ -670,3 +670,20 @@ function handleMessageBroadcasting(socket) {
 ```
 
 ![1693378154169](image/nodeInAction/1693378154169.png)
+
+**创建房间（CREATING ROOMS）**
+
+  接下来，您需要添加允许用户加入现有房间的功能，或者如果尚不存在则创建它。 图2.12显示了用户和服务器之间的交互。
+
+  将以下代码添加到 lib/chat_server.js 以启用房间更改。 注意Socket.IO的leave方法的使用：
+
+```JavaScript
+function handleRoomJoining(socket) {
+  socket.on("join", function (room) {
+    socket.leave(currentRoom[socket.id]);
+    joinRoom(socket, room.newRoom);
+  });
+}
+```
+
+![1693378664612](image/nodeInAction/1693378664612.png)

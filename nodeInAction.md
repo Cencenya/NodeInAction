@@ -559,7 +559,6 @@ exports.listen = function(server){
 
   为了处理这些问题，您将添加许多辅助函数。
 
-
 **访客名称的指派（assignGuestName）**
 
   您需要添加的第一个辅助函数是 `allocateGuestName`，它处理新用户的命名。 当用户第一次连接到聊天服务器时，该用户被放置在名为 Lobby 的聊天室中，并调用 `allocateGuestName` 为他们分配一个名称，以将他们与其他用户区分开来。
@@ -578,7 +577,6 @@ namesUsed.push(name); // Note that guest name is now used
 return guestNumber + 1; //  Increment counter used to generate guest names
 }
 ```
-
 
 **加入房间（JOINING ROOMS）**
 
@@ -609,6 +607,47 @@ return guestNumber + 1; //  Increment counter used to generate guest names
       usersInRoomSummary += '.';
       socket.emit('message',{text:usersInRoomSummary}); // 将房间内其他用户的摘要发送给该用户
   }
+}
+
+```
+
+
+**修改用户名（HANDLING NAME-CHANGE REQUESTS）**
+
+  如果每个用户只保留他们的访客姓名，就很难记住谁是谁。因此，聊天应用程序允许用户请求更改姓名。 如图 2.10 所示，名称更改涉及用户的 Web 浏览器通过 Socket.IO 发出请求，然后接收指示成功或失败的响应。![1693375927826](image/nodeInAction/1693375927826.png)
+
+  将以下清单中的代码添加到 lib/chat_server.js 以定义处理用户更改姓名请求的函数。 从应用程序的角度来看，用户不允许将其名称更改为以 Guest 开头的任何名称或使用已使用的名称。
+
+```JavaScript
+function handleNameChangeAttempts(socket, nickNames, namesUsed) {
+  socket.on("nameAttempt", function (name) { // Add listener for nameAttempt events
+    if (name.indexOf("Guest") == 0) { // 不允许将其名称更改为以 Guest 开头
+      socket.emit("nameResult", {
+        success: false,
+        message: 'Namescannotbeginwith"Guest".',
+      });
+    } else {
+      if (namesUsed.indexOf(name) == -1) { // 如果名称尚未注册，请注册
+        var previousName = nickNames[socket.id];
+        var previousNameIndex = namesUsed.indexOf(previousName);
+        namesUsed.push(name);
+        nickNames[socket.id] = name;
+        delete namesUsed[previousNameIndex]; // Remove previous name to make available to other clients
+
+        socket.emit("nameResult", { success: true, name: name });
+        socket.broadcast
+          .to(currentRoom[socket.id])
+          .emit("message", {
+            text: previousName + "isnowknownas" + name + ".",
+          });
+      } else {
+        socket.emit("nameResult", { // Send error to client if name is already registered
+          success: false,
+          message: "Thatnameisalreadyinuse.",
+        });
+      }
+    }
+  });
 }
 
 ```

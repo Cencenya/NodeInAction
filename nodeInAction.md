@@ -777,6 +777,8 @@ Chat.prototype.processCommand = function (command) {
 
 ![1693464605525](image/nodeInAction/1693464605525.png)
 
+
+
 在 `public/javascripts` 目录中，添加一个名为 `chat_ui.js `的文件，并在其中放入以下两个辅助函数：
 
 ```javascript
@@ -785,5 +787,26 @@ function divEscapedContentElement(message) {
 }
 function divSystemContentElement(message) {
   return $('<div></div>').html('<i>' + message + '</i>');
+}
+```
+
+
+您将附加到 `chat_ui.js `的下一个函数用于处理用户输入； 下面的清单中有详细说明。 如果用户输入以斜杠 (/) 字符开头，则将其视为聊天命令。 如果没有，它将作为聊天消息发送到服务器以广播给其他用户，并将其添加到用户当前所在房间的聊天室文本中
+
+```javascript
+function processUserInput(chatApp, socket) {
+  var message = $('#send-message').val();
+  var systemMessage;
+  if (message.charAt(0) == '/') { // if user input begins with slash, treat it as command
+    systemMessage = chatApp.processCommand(message);
+    if (systemMessage) {
+      $('#messages').append(divSystemContentElement(systemMessage));
+    }
+  } else {
+    chatApp.sendMessage($('#room').text(), message); // Broadcast noncommand input to other users
+    $('#messages').append(divEscapedContentElement(message));
+    $('#messages').scrollTop($('#messages').prop('scrollHeight'));
+  }
+  $('#send-message').val('');
 }
 ```

@@ -611,7 +611,6 @@ return guestNumber + 1; //  Increment counter used to generate guest names
 
 ```
 
-
 **修改用户名（HANDLING NAME-CHANGE REQUESTS）**
 
   如果每个用户只保留他们的访客姓名，就很难记住谁是谁。因此，聊天应用程序允许用户请求更改姓名。 如图 2.10 所示，名称更改涉及用户的 Web 浏览器通过 Socket.IO 发出请求，然后接收指示成功或失败的响应。![1693375927826](image/nodeInAction/1693375927826.png)
@@ -652,7 +651,6 @@ function handleNameChangeAttempts(socket, nickNames, namesUsed) {
 
 ```
 
-
  **发送聊天消息（SENDING CHAT MESSAGES）**
 
   现在已经处理了用户昵称，您需要添加一个函数来定义显示处理用户发送的聊天消息。 图2.11显示了基本流程：用户发出一个事件，指示要发送消息的房间和消息文本。 然后，服务器将消息转发给同一房间中的所有其他用户。
@@ -688,7 +686,6 @@ function handleRoomJoining(socket) {
 
 ![1693378664612](image/nodeInAction/1693378664612.png)
 
-
 **处理用户断开连接（ HANDLING USER DISCONNECTIONS）**
 
   最后，您需要将以下逻辑添加到 lib/chat_server.js，以从 nickNames 中删除用户的昵称，并在用户离开聊天应用程序时使用的名称：
@@ -696,11 +693,73 @@ function handleRoomJoining(socket) {
 ```JavaScript
 function handleClientDisconnection(socket) {
   socket.on("disconnect", function () {
-    varnameIndex = namesUsed.indexOf(nickNames[socket.id]);
-    deletenamesUsed[nameIndex];
-    deletenickNames[socket.id];
+    var nameIndex = namesUsed.indexOf(nickNames[socket.id]);
+    delete namesUsed[nameIndex];
+    delete nickNames[socket.id];
   });
 }
 ```
 
   完全定义服务器端组件后，您现在就可以进一步开发客户端逻辑。
+
+#### 2.5  使用客户端 JavaScript 作为应用程序的用户界面
+
+  现在您已经添加了服务器端 Socket.IO 逻辑来调度从浏览器发送的消息，是时候添加与服务器通信所需的客户端 JavaScript 了。 需要客户端 JavaScript 来处理以下功能：
+
+（1）将用户的消息和名称/房间更改请求发送到服务器
+
+（2）显示其他用户的消息和可用房间列表
+
+##### 2.5.1 将消息和名称/房间更改转发到服务器
+
+  您将添加的第一个客户端 JavaScript 是一个 JavaScript 原型对象，它将处理聊天命令、发送消息以及请求房间和昵称更改。
+   在 public/javascripts 目录中，创建一个名为 chat.js 的文件，并将以下代码放入其中。 此代码启动 JavaScript 的“class”等价物，该“class”在实例化时采用单个参数，即 Socket.IO 套接字
+
+```javascript
+var Chat = function(socket){ 
+  this.socket = socket;
+};
+```
+
+接下来添加以下函数来发送聊天消息：
+
+```javascript
+Chat.prototype.sendMessage = function (room, text) {
+  var message = { room: room, text: text };
+  this.socket.emit('message', message);
+};
+```
+
+添加以下函数来处理更改房间：
+
+```javascript
+Chat.prototype.changeRoom = function (room) {
+  this.socket.emit('join', { newRoom: room });
+};
+```
+
+最后，添加以下清单中定义的函数来处理聊天命令。 识别两个聊天命令：join用于加入或创建房间，nick用于更改昵称
+
+```JavaScript
+Chat.prototype.processCommand = function (command) {
+  var words = command.split('');
+  var command = words[0].substring(1, words[0].length).toLowerCase(); // Parse command from first word
+  var message = false;
+  switch (command) {
+    case 'join':
+      words.shift();
+      varroom = words.join('');
+      this.changeRoom(room); // Handle room changing/creating
+      break;
+    case 'nick':
+      words.shift();
+      varname = words.join('');
+      this.socket.emit('nameAttempt', name); // Handle name-change attempts
+      break;
+    default:
+      message = 'Unrecognizedcommand.'; // Return error message if command isn’t recognized 
+      break;
+  }
+  return message;
+};
+```

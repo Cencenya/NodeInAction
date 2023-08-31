@@ -810,3 +810,51 @@ function processUserInput(chatApp, socket) {
   $('#send-message').val('');
 }
 ```
+
+
+  现在您已经定义了一些辅助函数，您需要在以下清单中添加逻辑，这意味着当网页在用户浏览器中完全加载时执行。 此代码处理 Socket.IO 事件处理的客户端启动。
+
+```JavaScript
+var socket = io.connect();
+$(document).ready(function () {
+  var chatApp = new Chat(socket);
+  socket.on('nameResult', function (result) { // Display results of a name-change attempt
+    var message;
+    if (result.success) {
+      message = 'Youarenowknownas' + result.name + '.';
+    } else {
+      message = result.message;
+    }
+    $('#messages').append(divSystemContentElement(message));
+  });
+  socket.on('joinResult', function (result) { // Display results of a room change
+    $('#room').text(result.room);
+    $('#messages').append(divSystemContentElement('Roomchanged.'));
+  });
+  socket.on('message', function (message) { // Display received messages
+    var newElement = $('<div></div>').text(message.text);
+    $('#messages').append(newElement);
+  });
+  socket.on('rooms', function (rooms) { // Display list of rooms available
+    $('#room-list').empty();
+    for (var room in rooms) {
+      room = room.substring(1, room.length);
+      if (room != '') {
+        $('#room-list').append(divEscapedContentElement(room));
+      }
+    }
+    $('#room-listdiv').click(function () { // Allow click of a room name to change to that room
+      chatApp.processCommand('/join' + $(this).text());
+      $('#send-message').focus();
+    });
+  });
+  setInterval(function () { // Request list of rooms available intermittently
+    socket.emit('rooms');
+  }, 1000);
+  $('#send-message').focus();
+  $('#send-form').submit(function () { // Allow submitting the form to send a chat message
+    processUserInput(chatApp, socket);
+    return false;
+  });
+});
+```

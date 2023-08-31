@@ -858,3 +858,33 @@ $(document).ready(function () {
   });
 });
 ```
+
+
+ 要完成应用程序，请将以下清单中的最终 CSS 样式代码添加到**`public/stylesheets/style.css `**文件中。
+
+```css
+#room-list {
+  float: right;
+  width: 100px;
+  height: 300px;
+  overflow: auto;
+}
+#room-list div {
+  border-bottom: 1pxsolid#eee;
+}
+#room-list div:hover {
+  background-color: #ddd;
+}
+#send-message {
+  width: 700px;
+  margin-bottom: 1em;
+  margin-right: 1em;
+}
+#help {
+  font: 10px "LucidaGrande", Helvetica, Arial, sans-serif;
+}
+```
+
+添加最终代码后，尝试运行应用程序（使用 **`Node server.js`**）。 您的结果应如图 2.14 所示
+
+![1693466171024](image/nodeInAction/1693466171024.png)

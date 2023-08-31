@@ -763,3 +763,27 @@ Chat.prototype.processCommand = function (command) {
   return message;
 };
 ```
+
+##### 2.5.2 用户界面展示消息和可用的房间
+
+ 现在是时候开始添加使用 jQuery 直接与基于浏览器的用户界面交互的逻辑了。
+   您要添加的第一个功能是显示文本数据。 从安全角度来看，Web 应用程序中有两种类型的文本数据。一种是受信任的文本数据，由应用程序提供的文本组成；另一种是不受信任的文本数据，由应用程序的用户创建的文本或从其派生的文本。 来自用户的文本数据被认为是不可信的，因为恶意用户可能故意提交在 `<script>` 标记中包含 JavaScript 逻辑的文本数据。 这些文本数据如果不加更改地显示给其他用户，可能会导致发生令人讨厌的事情，例如将用户重定向到另一个网页。 这种劫持 Web 应用程序的方法称为跨站点脚本 (XSS) 攻击。
+
+  聊天应用程序将使用两个辅助函数来显示文本数据。 一个函数将显示不受信任的文本数据，另一个函数将显示受信任的文本数据。
+
+  函数 `divEscapedContentElement` 将显示不受信任的文本。 它将通过将特殊字符转换为 HTML 实体来清理文本，如图 2.13 所示，因此浏览器知道将它们显示为输入的内容，而不是尝试解释 HTML 标记的一部分。
+
+  函数 divSystemContentElement 将显示由系统而不是其他用户创建的可信内容。
+
+![1693464605525](image/nodeInAction/1693464605525.png)
+
+在 `public/javascripts` 目录中，添加一个名为 `chat_ui.js `的文件，并在其中放入以下两个辅助函数：
+
+```javascript
+function divEscapedContentElement(message) {
+  return $('<div></div>').text(message);
+}
+function divSystemContentElement(message) {
+  return $('<div></div>').html('<i>' + message + '</i>');
+}
+```

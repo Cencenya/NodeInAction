@@ -971,3 +971,35 @@ Fatalerror:Cannot redeclare uppercase_trim()
     模块存储在文件系统中的位置
 
     创建和使用模块时需要注意的事项
+
+
+**3.1.1 创建模块**
+
+  模块可以是单个文件，也可以是包含一个或多个文件的目录，如图 3.3 所示。 如果模块是一个目录，则将评估的模块目录中的文件通常命名为index.js（尽管可以覆盖它：请参阅第3.1.4节）。
+
+  要创建典型模块，您需要创建一个文件，该文件使用任何类型的数据（例如字符串、对象和函数）定义导出对象的属性。
+
+  为了展示如何创建基本模块，让我们向名为currency.js的文件添加一些货币转换功能。 该文件（如下面的清单所示）将包含两个将加元转换为美元的函数，反之亦然。
+
+```JavaScript
+var canadianDollar = 0.91;
+function roundTwoDecimals(amount) {
+  returnMath.round(amount * 100) / 100;
+}
+exports.canadianToUS = function (canadian) {
+  returnroundTwoDecimals(canadian * canadianDollar);
+};
+exports.USToCanadian = function (us) {
+  return roundTwoDecimals(us / canadianDollar);
+};
+```
+
+  请注意，仅设置了导出对象的两个属性。 这意味着应用程序（包括该模块）只能访问 canadianToUS 和 USToCanadian 这两个函数。 变量 canadianDollar 充当私有变量，影响 canadianToUS 和 USToCanadian 中的逻辑，但应用程序无法直接访问。
+
+   要利用您的新模块，请使用 Node 的 require 函数，该函数采用您希望用作参数的模块的路径。 节点执行同步查找以找到模块并加载文件的内容
+
+**Notes：关于 require 和同步 I/O** 
+
+`require` 是 Node.js 中少数可用的同步 I/O 操作之一。 由于模块经常使用并且通常包含在文件的顶部，因此同步 `require` 有助于保持代码干净、有序和可读。
+
+但请避免在应用程序的 I/O 密集型部分中使用 require。 任何同步调用都会阻止 Node 执行任何操作，直到调用完成。 例如，如果您正在运行 HTTP 服务器，那么如果您对每个传入请求使用 require，您的性能将会受到影响。 这通常就是为什么仅在应用程序最初加载时才使用 require 和其他同步操作的原因。

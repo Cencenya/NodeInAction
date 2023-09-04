@@ -890,7 +890,6 @@ $(document).ready(function () {
    您应该了解应用程序的构建方式以及代码是什么样的。 如果此示例应用程序的某些方面仍然不清楚，请不要担心：在接下来的章节中，我们将深入探讨此示例中使用的技巧和技术。
    然而，在深入研究 Node 开发的细节之前，您需要了解如何应对异步开发的独特挑战。 下一章将教您基本的技术和技巧，这将为您节省大量时间和减少挫败感。
 
-
 # 第三章 Node 基础
 
 前言：
@@ -926,8 +925,6 @@ $(document).ready(function () {
   如何对异步逻辑进行排序
 
 ---
-
-
 
 #### 3.1 组织和重用 Node 功能
 
@@ -972,7 +969,6 @@ Fatalerror:Cannot redeclare uppercase_trim()
 
     创建和使用模块时需要注意的事项
 
-
 **3.1.1 创建模块**
 
   模块可以是单个文件，也可以是包含一个或多个文件的目录，如图 3.3 所示。 如果模块是一个目录，则将评估的模块目录中的文件通常命名为index.js（尽管可以覆盖它：请参阅第3.1.4节）。
@@ -998,8 +994,28 @@ exports.USToCanadian = function (us) {
 
    要利用您的新模块，请使用 Node 的 require 函数，该函数采用您希望用作参数的模块的路径。 节点执行同步查找以找到模块并加载文件的内容
 
-**Notes：关于 require 和同步 I/O** 
+**Notes：关于 require 和同步 I/O**
 
 `require` 是 Node.js 中少数可用的同步 I/O 操作之一。 由于模块经常使用并且通常包含在文件的顶部，因此同步 `require` 有助于保持代码干净、有序和可读。
 
 但请避免在应用程序的 I/O 密集型部分中使用 require。 任何同步调用都会阻止 Node 执行任何操作，直到调用完成。 例如，如果您正在运行 HTTP 服务器，那么如果您对每个传入请求使用 require，您的性能将会受到影响。 这通常就是为什么仅在应用程序最初加载时才使用 require 和其他同步操作的原因。
+
+在下一个显示 test-currency.js 的清单中，您需要currency.js 模块。
+
+```JavaScript
+var currency=require('./currency'); // Path uses ./ to indicate that module exists within same directory as application script
+console.log('50 Canadian dollars equals this amount of USdollars:');
+console.log(currency.canadianToUS(50)); // Use currency module’s canadianToUS function
+console.log('30 US dollars equals this amount of Canadiandollars:');
+console.log(currency.USToCanadian(30)); // Use currency module’s USToCanadian function
+```
+
+  需要以 ./ 开头的模块意味着，如果您要在名为currency_app 的目录中创建名为 test-currency.js 的应用程序脚本，那么您的currency.js 模块文件（如图 3.4 所示）也需要存在于 currency_app 目录。 需要时，假定为 .js 扩展名，因此您可以根据需要省略它
+
+  Node 找到并评估您的模块后，require 函数将返回模块中定义的导出对象的内容。 然后，您可以使用模块返回的两个函数来进行货币转换
+
+  如果您想将模块放入子目录中，例如 lib，您可以通过简单地将包含 require 逻辑的行更改为以下内容来实现
+
+`var currency = require('./lib/currency');`
+
+  填充模块的导出对象为您提供了一种将可重用代码分组到单独文件中的简单方法

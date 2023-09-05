@@ -1019,3 +1019,42 @@ console.log(currency.USToCanadian(30)); // Use currency module’s USToCanadian 
 `var currency = require('./lib/currency');`
 
   填充模块的导出对象为您提供了一种将可重用代码分组到单独文件中的简单方法
+
+**3.1.2 使用 module.exports 微调模块创建**
+
+  尽管用函数和变量填充导出对象适合大多数模块创建需求，但有时您希望模块偏离此模型。
+
+  例如，可以重做本节前面创建的货币转换器模块以返回单个货币构造函数，而不是包含函数的对象。 面向对象的实现可能表现如下
+
+```javascript
+var Currency = require('./currency');
+var canadianDollar = 0.91;
+var currency = newCurrency(canadianDollar);
+console.log(currency.canadianToUS(50));
+```
+
+  从 require 返回一个函数而不是一个对象，如果它是您从模块中需要的唯一东西，将使您的代码更加优雅。
+
+  要创建返回单个变量或函数的模块，您可能会猜测您只需将 `exports`设置为您想要返回的任何内容。 但这是行不通的，因为 Node 期望`exports`不会被重新分配给任何其他对象、函数或变量。 下一个清单中的模块代码尝试将导出设置为函数。
+
+```javascript
+var Currency = function (canadianDollar) {
+  this.canadianDollar = canadianDollar;
+}
+Currency.prototype.roundTwoDecimals = function (amount) { return Math.round(amount * 100) / 100; }
+Currency.prototype.canadianToUS = function (canadian) { return this.roundTwoDecimals(canadian * this.canadianDollar); }
+Currency.prototype.USToCanadian = function (us) { return this.roundTwoDecimals(us / this.canadianDollar); }
+exports=Currency;  // Incorrect; Node doesn’t allow exports to be overwritten
+```
+
+为了使之前的模块代码按预期工作，您需要将 `exports`替换为 `module.exports`。 `module.exports` 机制使您能够导出单个变量、函数或对象。 如果您创建一个同时填充 `exports`和 `module.exports `的模块，则将返回 `module.exports `并忽略导出
+
+*What really gets exported*
+
+最终在应用程序中导出的是 `module.exports`。 `Exports` 被简单地设置为 `module.exports `的全局引用，它最初被定义为一个可以添加属性的空对象。 所以`exports.myFunc`只是`module.exports.myFunc`的简写。
+
+  因此，如果exports 设置为其他值，则会破坏 module.exports 和exports 之间的引用。 因为 module.exports 是真正导出的内容，所以导出将不再按预期工作——它不再引用 module.exports。 如果您想保留该链接，可以使 module.exports 再次引用导出，如下所示：
+
+`module.exports = exports = Currency;`
+
+通过使用 `Exports` 或 `module.exports`，根据您的需要，您可以将功能组织到模块中，并避免不断增长的应用程序脚本的陷阱。

@@ -1117,7 +1117,7 @@ NODE_PATH 环境变量提供了一种指定 Node 模块的替代位置的方法�
 
 #### 3.2 异步编程技术
 
-如果您做过前端 Web 编程，其中界面事件（例如鼠标点击）触发逻辑，那么您就完成了异步编程。 服务器端异步编程也不例外：事件发生会触发响应逻辑。Node 世界中有两种流行的模型用于管理响应逻辑：`Callbacks`和`Event listeners`
+如果您做过前端 Web 编程，其中界面事件（例如鼠标点击）触发逻辑，那么您就完成了异步编程。 服务器端异步编程也不例外：事件发生会触发响应逻辑。Node 世界中有两种流行的模型用于管理响应逻辑：`Callbacks`和 `Event listeners`
 
 `Callbacks`通常定义一次性响应的逻辑。 例如，如果执行数据库查询，则可以指定回调来确定如何处理查询结果。 回调可以显示数据库结果，根据结果进行计算，或者使用查询结果作为参数执行另一个回调
 
@@ -1136,3 +1136,44 @@ Node HTTP 服务器实例是事件发射器的一个示例，它是一个可以�
 异步编程的一些挑战
 
 让我们首先看看处理异步代码的最常见方法之一：使用回调
+
+**3.2.1 使用回调处理一次性事件**
+
+回调是一个函数，作为参数传递给异步函数，描述异步操作完成后要执行的操作。 回调在 Node 开发中使用频率很高，比 `event emitter`更频繁，而且使用起来很简单。
+
+为了演示回调在应用程序中的使用，让我们创建一个简单的 HTTP 服务器来执行以下操作：
+
+异步提取存储为 JSON 文件的最近帖子的标题
+
+异步拉取基本 HTML 模板
+
+组装包含标题的 HTML 页面
+
+将 HTML 页面发送给用户
+
+结果类似于图 3.7。
+
+JSON 文件 (titles.json)（如以下清单所示）将被格式化为包含帖子标题的字符串数组.
+
+```js
+// A list of post titles
+[
+  "Kazakhstanisahugecountry...whatgoesonthere?",
+  "Thisweatherismakingmecraaazy",
+  "Myneighborsortofhowlsatnight",
+];
+```
+
+```js
+// A basic HTML template to render the blog titles
+<!doctype html>
+  <html>
+    <head></head>
+    <body>
+      <h1>LatestPosts</h1>
+      <ul><li>%</li></ul> // % will be replaced with title data
+    </body>
+   </html>
+```
+
+_An example of the use of callbacks in a simple application_
